@@ -41,6 +41,7 @@ function NewJob(props) {
       <Formik
         initialValues={{
           jobTitle: '',
+          cronExpression: '',
         }}
         onSubmit={async (values, actions) => {
           if (!jobFilePath) {

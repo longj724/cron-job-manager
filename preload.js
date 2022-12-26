@@ -7,6 +7,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getJobs: () => ipcRenderer.invoke('getJobs'),
   deleteJob: (id, cronExpression, filePath) =>
     ipcRenderer.invoke('deleteJob', id, cronExpression, filePath),
-  updateJob: (id, title, filePath, textExpression) =>
-    ipcRenderer.invoke('updateJob', id, title, filePath, textExpression),
+  updateJob: (id, name, filePath, textExpression) =>
+    ipcRenderer.invoke('updateJob', id, name, filePath, textExpression),
 });

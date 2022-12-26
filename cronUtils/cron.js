@@ -2,7 +2,7 @@
 const { exec } = require('child_process');
 const fs = require('fs');
 
-exports.createCronJob = (filePath, cronExpression) => {
+exports.createCronJob = (cronExpression, filePath) => {
   exec('crontab -l > currentCronTab.txt', () => {
     fs.appendFile(
       'currentCronTab.txt',
@@ -47,6 +47,15 @@ exports.deleteCronJob = async (cronExpression, filePath) => {
   });
 };
 
-exports.updateCronJobExpression = (cronExpression) => {};
+exports.updateCronJob = async (
+  currentCronJob,
+  newCronExpression,
+  newFilePath
+) => {
+  await this.deleteCronJob(
+    currentCronJob.cron_expression,
+    currentCronJob.file_path
+  );
 
-exports.updateCronJobFilePath = (filePath) => {};
+  return this.createCronJob(newCronExpression, newFilePath);
+};

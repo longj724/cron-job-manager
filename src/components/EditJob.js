@@ -26,7 +26,6 @@ function EditJob(props) {
     textCronExpression: initialTextCronExpression,
   } = props;
   const [jobFilePath, setJobFilePath] = useState(initialFilePath);
-  const [jobName, setJobName] = useState(initialJobName);
 
   const handleDeleteJob = async () => {
     console.log('inputs are', {
@@ -66,11 +65,32 @@ function EditJob(props) {
     >
       <Formik
         initialValues={{
-          jobName: jobName,
+          jobName: initialJobName,
           cronExpression: initialTextCronExpression,
         }}
         onSubmit={async (values, actions) => {
           const { jobName, cronExpression } = values;
+
+          const updatedCronJob = await window.electronAPI.updateJob(
+            id,
+            jobName,
+            jobFilePath,
+            cronExpression
+          );
+
+          if (!updatedCronJob.error) {
+            setJobs((prevJobs) => {
+              return prevJobs.map((job) => {
+                if (job.id === id) {
+                  return updatedCronJob;
+                }
+                return job;
+              });
+            });
+            setIsEditing(false);
+          } else {
+            alert('Error updating cron job.');
+          }
         }}
         validationSchema={Yup.object({
           jobName: Yup.string().required('Required'),

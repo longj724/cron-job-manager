@@ -6,7 +6,11 @@ const { PrismaClient } = require('@prisma/client');
 const {
   generateCronExpression,
 } = require('../cronUtils/generateCronExpression');
-const { createCronJob, deleteCronJob } = require('../cronUtils/cron.js');
+const {
+  createCronJob,
+  deleteCronJob,
+  updateCronJob,
+} = require('../cronUtils/cron.js');
 
 const prisma = new PrismaClient();
 
@@ -34,7 +38,7 @@ exports.handleCreateCronJob = async (_, title, filePath, textExpression) => {
   // console.log('cron Expression is', cronExpression);
   const cronExpression = '3 * * * *';
 
-  const createJobSuccessful = createCronJob(filePath, cronExpression);
+  const createJobSuccessful = createCronJob(cronExpression, filePath);
   console.log('createJobSuccessful is', createJobSuccessful);
 
   if (createJobSuccessful) {
@@ -75,4 +79,41 @@ exports.handleDeleteJob = async (_, id, cronExpression, filePath) => {
   return { error: 'Error deleting cron job' };
 };
 
-exports.handleUpdateJob = async (_, id, title, filePath, textExpression) => {};
+exports.handleUpdateJob = async (_, id, name, filePath, textExpression) => {
+  // Get current cron job info
+  const currentCronJob = await prisma.jobs.findUnique({
+    where: {
+      id: id,
+    },
+  });
+
+  let newCronExpression = currentCronJob.cron_expression;
+
+  if (textExpression !== currentCronJob.text_cron_expression) {
+    // newCronExpression = await generateCronExpression(textExpression);
+  }
+
+  const updateCronJobSuccessful = updateCronJob(
+    currentCronJob,
+    newCronExpression,
+    filePath
+  );
+
+  if (updateCronJobSuccessful) {
+    const updatedJob = await prisma.jobs.update({
+      where: {
+        id: id,
+      },
+      data: {
+        cron_expression: newCronExpression,
+        file_path: filePath,
+        name: name,
+        text_cron_expression: textExpression,
+      },
+    });
+
+    return updatedJob;
+  }
+
+  return { error: 'Error updating cron job' };
+};
