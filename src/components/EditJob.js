@@ -28,11 +28,6 @@ function EditJob(props) {
   const [jobFilePath, setJobFilePath] = useState(initialFilePath);
 
   const handleDeleteJob = async () => {
-    console.log('inputs are', {
-      id,
-      cronExpression,
-      initialFilePath,
-    });
     const successfulDelete = await window.electronAPI.deleteJob(
       id,
       cronExpression,

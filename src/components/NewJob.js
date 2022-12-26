@@ -58,7 +58,7 @@ function NewJob(props) {
             cronExpression
           );
 
-          if (newCronJob) {
+          if (!newCronJob.error) {
             actions.setSubmitting(false);
             setShowNewJobForm(false);
             setJobs((prevJobs) => [...prevJobs, newCronJob]);

@@ -29,17 +29,11 @@ exports.handleGetJobs = async () => {
 };
 
 exports.handleCreateCronJob = async (_, title, filePath, textExpression) => {
-  console.log('title is', title);
-  console.log('filePath is', filePath);
-  console.log('textExpression is', textExpression);
-  console.log('at start of function');
-
   // const cronExpression = await generateCronExpression(textExpression);
   // console.log('cron Expression is', cronExpression);
   const cronExpression = '3 * * * *';
 
-  const createJobSuccessful = createCronJob(cronExpression, filePath);
-  console.log('createJobSuccessful is', createJobSuccessful);
+  const createJobSuccessful = await createCronJob(cronExpression, filePath);
 
   if (createJobSuccessful) {
     const cronJob = await prisma.jobs.create({
@@ -57,14 +51,7 @@ exports.handleCreateCronJob = async (_, title, filePath, textExpression) => {
 };
 
 exports.handleDeleteJob = async (_, id, cronExpression, filePath) => {
-  console.log('inputs are', {
-    id,
-    cronExpression,
-    filePath,
-  });
   const deleteSuccessful = await deleteCronJob(cronExpression, filePath);
-
-  console.log('deleteSuccessful is', deleteSuccessful);
 
   if (deleteSuccessful) {
     const deletedCronJob = await prisma.jobs.delete({
@@ -80,7 +67,6 @@ exports.handleDeleteJob = async (_, id, cronExpression, filePath) => {
 };
 
 exports.handleUpdateJob = async (_, id, name, filePath, textExpression) => {
-  // Get current cron job info
   const currentCronJob = await prisma.jobs.findUnique({
     where: {
       id: id,
