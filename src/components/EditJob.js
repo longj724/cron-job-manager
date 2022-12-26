@@ -36,6 +36,32 @@ function EditJob(props) {
 
     if (!successfulDelete.error) {
       setJobs((prevJobs) => prevJobs.filter((job) => job.id !== id));
+      setIsEditing(false);
+    }
+  };
+
+  const handleUpdateJob = async (values) => {
+    const { jobName, cronExpression } = values;
+
+    const updatedCronJob = await window.electronAPI.updateJob(
+      id,
+      jobName,
+      jobFilePath,
+      cronExpression
+    );
+
+    if (!updatedCronJob.error) {
+      setJobs((prevJobs) => {
+        return prevJobs.map((job) => {
+          if (job.id === id) {
+            return updatedCronJob;
+          }
+          return job;
+        });
+      });
+      setIsEditing(false);
+    } else {
+      alert('Error updating cron job.');
     }
   };
 
@@ -62,30 +88,6 @@ function EditJob(props) {
         initialValues={{
           jobName: initialJobName,
           cronExpression: initialTextCronExpression,
-        }}
-        onSubmit={async (values, actions) => {
-          const { jobName, cronExpression } = values;
-
-          const updatedCronJob = await window.electronAPI.updateJob(
-            id,
-            jobName,
-            jobFilePath,
-            cronExpression
-          );
-
-          if (!updatedCronJob.error) {
-            setJobs((prevJobs) => {
-              return prevJobs.map((job) => {
-                if (job.id === id) {
-                  return updatedCronJob;
-                }
-                return job;
-              });
-            });
-            setIsEditing(false);
-          } else {
-            alert('Error updating cron job.');
-          }
         }}
         validationSchema={Yup.object({
           jobName: Yup.string().required('Required'),
@@ -167,6 +169,7 @@ function EditJob(props) {
                   type="submit"
                   size="sm"
                   width="50%"
+                  onClick={() => handleUpdateJob(props.values)}
                 >
                   Update Job
                 </Button>

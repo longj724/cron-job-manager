@@ -9,7 +9,6 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 exports.generateCronExpression = async (textExpression) => {
-  console.log('generateCronExpression', textExpression);
   const response = await openai.createCompletion({
     model: 'text-davinci-003',
     prompt: `Generate the cron job expression for the following statement: "${textExpression}"`,

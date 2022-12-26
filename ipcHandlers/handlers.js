@@ -29,9 +29,7 @@ exports.handleGetJobs = async () => {
 };
 
 exports.handleCreateCronJob = async (_, title, filePath, textExpression) => {
-  // const cronExpression = await generateCronExpression(textExpression);
-  // console.log('cron Expression is', cronExpression);
-  const cronExpression = '3 * * * *';
+  const cronExpression = await generateCronExpression(textExpression);
 
   const createJobSuccessful = await createCronJob(cronExpression, filePath);
 
@@ -51,7 +49,7 @@ exports.handleCreateCronJob = async (_, title, filePath, textExpression) => {
 };
 
 exports.handleDeleteJob = async (_, id, cronExpression, filePath) => {
-  const deleteSuccessful = await deleteCronJob(cronExpression, filePath);
+  const deleteSuccessful = await deleteCronJob(filePath);
 
   if (deleteSuccessful) {
     const deletedCronJob = await prisma.jobs.delete({
@@ -76,7 +74,7 @@ exports.handleUpdateJob = async (_, id, name, filePath, textExpression) => {
   let newCronExpression = currentCronJob.cron_expression;
 
   if (textExpression !== currentCronJob.text_cron_expression) {
-    // newCronExpression = await generateCronExpression(textExpression);
+    newCronExpression = await generateCronExpression(textExpression);
   }
 
   const updateCronJobSuccessful = updateCronJob(

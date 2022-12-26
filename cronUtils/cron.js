@@ -1,33 +1,61 @@
 // External Dependencies
+const { PrismaClient } = require('@prisma/client');
 const { exec } = require('child_process');
 const fs = require('fs');
 
+const prisma = new PrismaClient();
+
 exports.createCronJob = async (cronExpression, filePath) => {
-  return new Promise((resolve, reject) => {
-    exec('crontab -l > currentCronTab.txt', (error) => {
-      if (error) {
-        reject(false);
-      }
+  return new Promise(async (resolve, reject) => {
+    const allCronJobs = await prisma.jobs.findMany();
 
-      fs.appendFile(
-        'currentCronTab.txt',
-        `${cronExpression} ${filePath}\n`,
-        () => {}
-      );
-
-      exec('crontab currentCronTab.txt', (error) => {
-        if (error) {
-          reject(false);
-        } else {
-          fs.writeFile('currentCronTab.txt', '', () => {});
+    if (allCronJobs.length !== 0) {
+      exec('crontab -l > currentCronTab.txt', async (error) => {
+        if (error) reject(false);
+        const addCronJobSuccessful = await appendCronJobToCrontab(
+          cronExpression,
+          filePath
+        );
+        if (addCronJobSuccessful) {
           resolve(true);
+        } else {
+          reject(false);
         }
       });
+    } else {
+      const addCronJobSuccessful = await appendCronJobToCrontab(
+        cronExpression,
+        filePath
+      );
+      if (addCronJobSuccessful) {
+        resolve(true);
+      } else {
+        reject(false);
+      }
+    }
+  });
+};
+
+const appendCronJobToCrontab = async (cronExpression, filePath) => {
+  fs.appendFile(
+    'currentCronTab.txt',
+    `${cronExpression} ${filePath}\n`,
+    () => {}
+  );
+
+  return new Promise((resolve, reject) => {
+    exec('crontab currentCronTab.txt', (error) => {
+      if (error) {
+        reject(false);
+      } else {
+        fs.writeFile('currentCronTab.txt', '', () => {});
+        resolve(true);
+      }
     });
   });
 };
 
-exports.deleteCronJob = async (cronExpression, filePath) => {
+exports.deleteCronJob = async (filePath) => {
   return new Promise((resolve, reject) => {
     exec(
       `crontab -l | grep -v "${filePath}" | crontab -`,
@@ -54,10 +82,12 @@ exports.updateCronJob = async (
   newCronExpression,
   newFilePath
 ) => {
-  await this.deleteCronJob(
-    currentCronJob.cron_expression,
-    currentCronJob.file_path
+  await this.deleteCronJob(currentCronJob.file_path);
+
+  const cronJobCreated = await this.createCronJob(
+    newCronExpression,
+    newFilePath
   );
 
-  return this.createCronJob(newCronExpression, newFilePath);
+  return cronJobCreated;
 };
