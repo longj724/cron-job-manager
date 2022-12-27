@@ -2,8 +2,6 @@
 import { useEffect, useState } from 'react';
 import { Button, Flex, Heading } from '@chakra-ui/react';
 
-// Absolute Dependencies
-
 // Relative Dependencies
 import Job from './components/Job';
 import NewJob from './components/NewJob';

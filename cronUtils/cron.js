@@ -70,7 +70,6 @@ exports.deleteCronJob = async (filePath) => {
           reject(false);
         }
 
-        console.log('cron job successfully deleted');
         resolve(true);
       }
     );

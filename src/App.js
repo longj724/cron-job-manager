@@ -1,8 +1,6 @@
 // External Dependencies
 import { ChakraProvider } from '@chakra-ui/react';
 
-// Absolute Dependencies
-
 // Relative Dependencies
 import JobsPage from './JobsPage';
 

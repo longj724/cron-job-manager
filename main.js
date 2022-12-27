@@ -3,7 +3,7 @@ const path = require('path');
 const { app, BrowserWindow, ipcMain } = require('electron');
 const isDev = require('electron-is-dev');
 
-// Reltaive Dependencies
+// Relative Dependencies
 const {
   handleCreateCronJob,
   handleDeleteJob,
@@ -41,6 +41,7 @@ app.whenReady().then(() => {
   ipcMain.handle('updateJob', handleUpdateJob);
 
   createWindow();
+
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();
