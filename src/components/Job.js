@@ -1,6 +1,7 @@
 // External Dependency
 import { useState } from 'react';
 import { Button, Flex, Heading } from '@chakra-ui/react';
+import moment from 'moment';
 
 // Relative Dependencies
 import EditJob from './EditJob';
@@ -17,6 +18,8 @@ function Job(props) {
     name,
     text_cron_expression: textCronExpression,
   } = job;
+
+  const momentDate = moment(createdAt).toDate('DD-MM-YYYY');
 
   return isEditing ? (
     <EditJob
@@ -51,7 +54,7 @@ function Job(props) {
       </Flex>
       <Flex width="50%" height="100%" direction="column">
         <Heading size="sm" ml="10px">
-          Created At: {createdAt.toString()}
+          Created At: {momentDate.toLocaleString()}
         </Heading>
         <Heading size="sm" ml="10px" mt="10px">
           Cron Expression: {cronExpression}

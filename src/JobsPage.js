@@ -36,7 +36,7 @@ function JobsPage() {
       </Heading>
       {jobs.length !== 0 &&
         jobs.map((job) => <Job key={job.id} job={job} setJobs={setJobs} />)}
-      {!jobs.length && <NoJobs />}
+      {!jobs.length && !showNewJobForm && <NoJobs />}
       {showNewJobForm && (
         <NewJob setShowNewJobForm={setShowNewJobForm} setJobs={setJobs} />
       )}

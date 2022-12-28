@@ -14,6 +14,7 @@ const {
 
 function createWindow() {
   const win = new BrowserWindow({
+    title: 'Cron Job Manager',
     width: 850,
     height: 700,
     webPreferences: {
@@ -25,7 +26,7 @@ function createWindow() {
   win.loadURL(
     isDev
       ? 'http://localhost:3000'
-      : `file://${path.join(__dirname, '../public/build/index.html')}`
+      : `file://${path.join(__dirname, './build/index.html')}`
   );
 
   if (isDev) {
