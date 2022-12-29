@@ -1,7 +1,6 @@
 // External Dependencies
 const { PrismaClient } = require('@prisma/client');
 const { exec } = require('child_process');
-const fs = require('fs');
 
 const prisma = new PrismaClient();
 
@@ -10,48 +9,19 @@ exports.createCronJob = async (cronExpression, filePath) => {
     const allCronJobs = await prisma.jobs.findMany();
 
     if (allCronJobs.length !== 0) {
-      exec('crontab -l > currentCronTab.txt', async (error) => {
-        if (error) reject(false);
-        const addCronJobSuccessful = await appendCronJobToCrontab(
-          cronExpression,
-          filePath
-        );
-        if (addCronJobSuccessful) {
+      exec(
+        `(crontab -l ; echo "${cronExpression} ${filePath}") | crontab -`,
+        async (error) => {
+          if (error) reject(false);
           resolve(true);
-        } else {
-          reject(false);
         }
-      });
-    } else {
-      const addCronJobSuccessful = await appendCronJobToCrontab(
-        cronExpression,
-        filePath
       );
-      if (addCronJobSuccessful) {
+    } else {
+      exec(`echo "${cronExpression} ${filePath}" | crontab -`, (error) => {
+        if (error) reject(false);
         resolve(true);
-      } else {
-        reject(false);
-      }
+      });
     }
-  });
-};
-
-const appendCronJobToCrontab = async (cronExpression, filePath) => {
-  fs.appendFile(
-    'currentCronTab.txt',
-    `${cronExpression} ${filePath}\n`,
-    () => {}
-  );
-
-  return new Promise((resolve, reject) => {
-    exec('crontab currentCronTab.txt', (error) => {
-      if (error) {
-        reject(false);
-      } else {
-        fs.writeFile('currentCronTab.txt', '', () => {});
-        resolve(true);
-      }
-    });
   });
 };
 
